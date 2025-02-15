@@ -135,12 +135,16 @@ def setup_simulation():
 
     p.loadURDF("plane.urdf")  # Load the ground plane
     table_id = p.loadURDF("table/table.urdf", [0.5, 0, 0], p.getQuaternionFromEuler([0, 0, 0]))  # Load the table
+    bin_pos = [0.5, 0, 0.6]
+    bin_orn = p.getQuaternionFromEuler([0, 0, 0])
+    bin_id = p.loadURDF("tray/tray.urdf", bin_pos, bin_orn)
+
     cube_id2 = p.loadURDF("cube.urdf", [0.5, 0.9, 0.3], p.getQuaternionFromEuler([0, 0, 0]), globalScaling=0.6, useFixedBase=True)
 
     tray_pos = [0.5, 0.9, 0.6]  # Set the initial position of the tray
     tray_orn = p.getQuaternionFromEuler([0, 0, 0])  # Set the orientation of the tray
     tray_id = p.loadURDF("tray/tray.urdf", tray_pos, tray_orn)  # Load the tray model
-    return tray_pos, tray_orn
+    return tray_pos, tray_orn, bin_pos
 
 def random_color_cube(cube_id):
     """
@@ -151,7 +155,7 @@ def random_color_cube(cube_id):
     color = [random.random(), random.random(), random.random(), 1.0]  # Random color with full opacity
     p.changeVisualShape(cube_id, -1, rgbaColor=color)
 
-def move_and_grab_cube(robot, tray_pos, counter):
+def move_and_grab_cube(robot, tray_pos, bin_pos, counter):
     """
     Move the robot arm to the cube's position and grab it.
     """
@@ -162,10 +166,10 @@ def move_and_grab_cube(robot, tray_pos, counter):
         for i, joint_id in enumerate(robot.arm_controllable_joints):
             p.setJointMotorControl2(robot.id, joint_id, p.POSITION_CONTROL, target_joint_positions[i])
         update_simulation(200)
-        x_range = [0.3, 0.7]  # Range for x-coordinate
-        y_range = [-0.1, 0.1]  # Range for y-coordinate
+        x_range = [bin_pos[0] - 0.1, bin_pos[0] + 0.1]  # Keep inside bin's x-range
+        y_range = [bin_pos[1] - 0.1, bin_pos[1] + 0.1]  # Keep inside bin's y-range
         cube_start_pos = [random.uniform(x_range[0], x_range[1]),
-                        random.uniform(y_range[0], y_range[1]), 0.65]
+                        random.uniform(y_range[0], y_range[1]), bin_pos[2] + 0.05]
         cube_start_pos1=0.78
         cube_start_orn = p.getQuaternionFromEuler([0, 0, 0])  # Cube orientation
         cube_id = p.loadURDF("cube_small.urdf", cube_start_pos, cube_start_orn)
@@ -185,7 +189,7 @@ def move_and_grab_cube(robot, tray_pos, counter):
         print("End-effector orientation (quaternion):", eef_orientation)
 
         # Move to a position above the cube
-        robot.move_arm_ik([cube_start_pos[0], cube_start_pos[1], cube_start_pos1+0.05], eef_orientation)
+        robot.move_arm_ik([cube_start_pos[0], cube_start_pos[1], cube_start_pos1 + 0.05], eef_orientation)
         time.sleep(0.5)
         update_simulation(50)  # Update the simulation for 50 steps
         # Move to the cube
@@ -205,14 +209,8 @@ def move_and_grab_cube(robot, tray_pos, counter):
         robot.move_gripper(0,cube_id)  # Open the gripper
         update_simulation(50)
 
-        # Update the displayed counter
-        counter += 1  # Increment the counter
-        # Update the text displayed above the tray
-        p.addUserDebugText(f"Count: {counter}",textColorRGB=[255, 0, 0], textPosition=[tray_pos[0], tray_pos[1], tray_pos[2] + 0.3],
-                           textSize=3, lifeTime=10)  
-
 def main():
-    tray_pos, tray_orn = setup_simulation()
+    tray_pos, tray_orn, bin_pos = setup_simulation()
     
     # Load the robot arm
     robot = UR5Epick([0, 0, 0.62], [0, 0, 0])
@@ -220,7 +218,7 @@ def main():
 
   
     counter = 0
-    move_and_grab_cube(robot, tray_pos, counter)
+    move_and_grab_cube(robot, tray_pos, bin_pos, counter)
 
 if __name__ == "__main__":
     main()
