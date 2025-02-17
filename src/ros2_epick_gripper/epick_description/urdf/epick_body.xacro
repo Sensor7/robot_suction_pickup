@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:include filename="helper_macros.xacro"/>
+  <xacro:macro name="epick_body"
+               params="parent:=^
+                       origin_xyz:=^|'0 0 0'
+                       origin_rpy:=^|'0 0 0'
+                       prefix:=^|''">
+
+    <xacro:property name="base_link" value="${prefix}epick_base_link"/>
+    <xacro:property name="body_link" value="${prefix}epick_body" scope="parent"/>
+    <xacro:property name="body_length" value="0.1023" scope="parent"/>
+    <xacro:property name="body_color" value="0.25 0.25 0.25 1" scope="parent"/>
+    <xacro:property name="body_collision_radius" value="0.044"/>
+
+    <link name="${base_link}">
+      <inertial>
+          <origin xyz="0 0 0" rpy="0 0 0" />
+          <mass value="6.6320197e-02" />
+          <inertia ixx="5.1617816e-04" iyy="5.8802208e-04" izz="3.9462776e-04" ixy="2.936e-8" ixz="0.0" iyz="-3.2296e-7" />
+      </inertial>
+    </link>
+
+    <xacro:joint parent="${parent}"
+                 child="${base_link}"
+                 xyz="${origin_xyz}"
+                 rpy="${origin_rpy}"/>
+
+    <link name="${body_link}">
+      <visual>
+        <!-- <origin xyz="0 0 ${-body_length / 2}" rpy="0 0 0"/> -->
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <!-- <mesh filename="package://epick_description/meshes/visual/epick_body.stl"
+            scale="0.001 0.001 0.001"/> -->
+            <cylinder radius="${body_collision_radius}" length="${body_length}"/>
+        </geometry>
+        <material name="epick_gray">
+          <color rgba="${body_color}"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="${body_collision_radius}" length="${body_length}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.066320197"/>
+        <inertia ixx="0.00051617816" iyy="0.00058802208" izz="0.00039462776" ixy="2.936e-8" ixz="0.0" iyz="-3.2296e-7"/>
+      </inertial>
+    </link>
+
+    <xacro:joint parent="${base_link}"
+                 child="${body_link}"
+                 xyz="0 0 ${body_length / 2}"
+                 rpy="0 0 0"/>
+
+  </xacro:macro>
+</robot>

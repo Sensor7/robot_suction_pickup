@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="epick_driver_ros2_control"
+               params="name use_fake_hardware:=true
+                       usb_port:=/dev/ttyUSB0
+                       baud_rate:=115200
+                       timeout:=0.2
+                       slave_address:=0x9
+                       mode:=AdvancedMode
+                       grip_max_vacuum_pressure:=-60
+                       grip_min_vacuum_pressure:=-10
+                       grip_timeout:=25.0
+                       release_timeout:=2.0">
+
+    <ros2_control name="${name}" type="system">
+      <!-- <hardware>
+        <plugin>epick_driver/EpickGripperHardwareInterface</plugin>
+        <param name="usb_port">${usb_port}</param>
+        <param name="baud_rate">${baud_rate}</param>
+        <param name="timeout">${timeout}</param>
+        <param name="use_dummy">${use_fake_hardware}</param>
+        <param name="slave_address">${slave_address}</param>
+        <param name="mode">${mode}</param>
+        <param name="grip_max_vacuum_pressure">${grip_max_vacuum_pressure}</param>
+        <param name="grip_min_vacuum_pressure">${grip_min_vacuum_pressure}</param>
+        <param name="grip_timeout">${grip_timeout}</param>
+        <param name="release_timeout">${release_timeout}</param>
+
+      </hardware> -->
+      <hardware>
+          <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+      </hardware>
+
+      <!-- <gpio name="gripper">
+        <command_interface name="grip_cmd"/>
+        <state_interface name="grip_cmd"/>
+        <state_interface name="object_detection_status"/>
+      </gpio> -->
+      <joint name="gripper">
+        <command_interface name="position"/>
+        <state_interface name="position">
+            <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+      </joint>
+
+    </ros2_control>
+
+  </xacro:macro>
+</robot>

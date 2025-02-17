@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="suction_ur5e_gripper">
+
+    <xacro:arg name="left_initial_positions_file" default="$(find suction_ur5e_gripper_moveit_config)/config/left_initial_positions.yaml"/>
+
+    <!-- Root link -->
+    <link name="world"/>
+
+    <!-- Xacro imports -->
+    <xacro:include filename="single_ur5e_gripper.urdf.xacro" />
+
+    <!-- Left arm -->
+    <xacro:ur5e_gripper name="left_ur" prefix="left_" parent="world" initial_positions_file="$(arg left_initial_positions_file)">
+        <origin xyz="0 0.5 1.03" rpy="0 0 0" />
+    </xacro:ur5e_gripper>
+
+    <!-- realsense d435 -->
+    <xacro:arg name="use_nominal_extrinsics" default="true"/>
+    <xacro:arg name="add_plug" default="false" />
+    <xacro:arg name="use_mesh" default="true" />
+    <xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro" />
+    <xacro:sensor_d435 parent="world" use_nominal_extrinsics="$(arg use_nominal_extrinsics)" add_plug="$(arg add_plug)" use_mesh="$(arg use_mesh)">
+        <origin xyz="1.5 0 2" rpy="0 0.785398163 3.1415926"/>
+    </xacro:sensor_d435>
+
+    <gazebo>
+        <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+            <parameters>$(find suction_ur5e_gripper_moveit_config)/config/suction_ur5e_gripper_controllers.yaml</parameters>
+        </plugin>
+    </gazebo>
+
+    <gazebo>
+        <plugin name="gazebo_ros_vacuum_gripper" filename="libgazebo_ros_vacuum_gripper.so">
+            <ros>
+                <namespace>/demo</namespace>
+                <remapping>switch:=custom_switch</remapping>
+                <remapping>grasping:=custom_grasping</remapping>
+            </ros>
+            <link_name>left_epick_vacuum_state</link_name>
+            <max_distance>0.05</max_distance>
+            <fixed>ground_plane</fixed>
+            
+        </plugin>
+    </gazebo>
+
+
+</robot>

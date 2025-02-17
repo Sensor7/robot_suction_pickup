@@ -1,0 +1,13 @@
+# gazebo_seg dataset
+
+path: ../datasets/gazebo_seg
+train: images/train # train images (relative to 'path')
+val: images/val # val images (relative to 'path')
+test: images/test # test images (relative to 'path')
+
+# Classes
+names:
+  0: robot
+  1: cube
+
+download: https://github.com/zitongbai/gazebo_seg_dataset/raw/main/datasets/gazebo_seg.zip
