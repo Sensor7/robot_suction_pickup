@@ -144,7 +144,8 @@ def launch_setup(context, *args, **kwargs):
             trajectory_execution,
             moveit_controllers,
             planning_scene_monitor_parameters,
-            {"use_sim_time": use_sim_time},
+            {"use_sim_time": use_sim_time,
+             "joint_state_topic": "/joint_states"},
         ],
     )
 

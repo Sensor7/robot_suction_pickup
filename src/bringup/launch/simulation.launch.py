@@ -3,14 +3,17 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, Opaq
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.substitutions import FindPackageShare
+from launch.substitutions import PathJoinSubstitution
+from ament_index_python.packages import get_package_share_directory
+from launch_ros.actions import Node
 
 
 def launch_setup(context, *args, **kwargs):
 
     # load urdf, launch gazebo
-    dual_ur5e_gripper_control_launch = IncludeLaunchDescription(
+    suction_ur5e_gripper_control_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            [FindPackageShare("dual_ur5e_gripper_moveit_config"), "/launch", "/dual_ur5e_gripper_sim_control.launch.py"]
+            [FindPackageShare("suction_ur5e_gripper_moveit_config"), "/launch", "/suction_ur5e_gripper_sim_control.launch.py"]
         ),
         launch_arguments={
             "launch_rviz": "true",
@@ -18,33 +21,28 @@ def launch_setup(context, *args, **kwargs):
     )
 
     # load moveit config
-    dual_ur5e_gripper_moveit_launch = IncludeLaunchDescription(
+    suction_ur5e_gripper_moveit_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            [FindPackageShare("dual_ur5e_gripper_moveit_config"), "/launch", "/dual_ur5e_gripper_moveit.launch.py"]
+            [FindPackageShare("suction_ur5e_gripper_moveit_config"), "/launch", "/suction_ur5e_gripper_moveit.launch.py"]
         ),
         launch_arguments={
             "use_sim_time": "true",
         }.items(),
     )
 
-    # depth image registered (align to color image)
-    register_depth_launch = IncludeLaunchDescription(
+    suction_ur5e_gripper_vision_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            [FindPackageShare("vision"), "/launch", "/register_depth.launch.py"]
+            [FindPackageShare("ur5e_gripper_control"), "/launch", "/vision.launch.py"]
         ),
-    )
-
-    vision_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            [FindPackageShare("vision"), "/launch", "/seg_and_det.launch.py"]
-        ),
+        launch_arguments={
+            "use_sim_time": "true",
+        }.items(),
     )
 
     nodes_to_launch = [
-        dual_ur5e_gripper_control_launch,
-        dual_ur5e_gripper_moveit_launch,
-        register_depth_launch,
-        vision_launch,
+        suction_ur5e_gripper_control_launch,
+        suction_ur5e_gripper_moveit_launch,
+        suction_ur5e_gripper_vision_launch
     ]
 
     return nodes_to_launch
@@ -52,5 +50,8 @@ def launch_setup(context, *args, **kwargs):
 
 def generate_launch_description():
     declared_arguments = []
+    robot_description_kinematics = PathJoinSubstitution(
+        [FindPackageShare("suction_ur5e_gripper_moveit_config"), "config", "kinematics.yaml"]
+    )
 
-    return LaunchDescription(declared_arguments + [OpaqueFunction(function=launch_setup)])
+    return LaunchDescription([OpaqueFunction(function=launch_setup)])

@@ -4,8 +4,6 @@
 controller_names:
   - left_ur5e_arm_controller
   - left_gripper_controller
-  - right_ur5e_arm_controller
-  - right_gripper_controller
 
 left_ur5e_arm_controller:
   type: FollowJointTrajectory

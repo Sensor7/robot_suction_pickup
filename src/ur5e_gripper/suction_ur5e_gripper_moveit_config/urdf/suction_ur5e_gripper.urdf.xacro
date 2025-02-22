@@ -19,8 +19,8 @@
     <xacro:arg name="add_plug" default="false" />
     <xacro:arg name="use_mesh" default="true" />
     <xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro" />
-    <xacro:sensor_d435 parent="world" use_nominal_extrinsics="$(arg use_nominal_extrinsics)" add_plug="$(arg add_plug)" use_mesh="$(arg use_mesh)">
-        <origin xyz="1.5 0 2" rpy="0 0.785398163 3.1415926"/>
+    <xacro:sensor_d435 parent="left_tool0" use_nominal_extrinsics="$(arg use_nominal_extrinsics)" add_plug="$(arg add_plug)" use_mesh="$(arg use_mesh)">
+        <origin xyz="0 -0.035 -0.03" rpy="-1.57 -1.57 3.14"/>
     </xacro:sensor_d435>
 
     <gazebo>
@@ -32,12 +32,17 @@
     <gazebo>
         <plugin name="gazebo_ros_vacuum_gripper" filename="libgazebo_ros_vacuum_gripper.so">
             <ros>
-                <namespace>/demo</namespace>
-                <remapping>switch:=custom_switch</remapping>
-                <remapping>grasping:=custom_grasping</remapping>
+                <namespace>/epick</namespace>
+                <remapping>switch:=switch</remapping>
+                <remapping>grasping:=grasping</remapping>
             </ros>
             <link_name>left_epick_vacuum_state</link_name>
-            <max_distance>0.05</max_distance>
+            <max_distance>0.1</max_distance>
+            <min_distance>0.01</min_distance>
+            <max_pressure>0.5</max_pressure>
+            <min_pressure>0.1</min_pressure>
+            <min_force>100</min_force>
+            <max_force>400</max_force>
             <fixed>ground_plane</fixed>
             
         </plugin>
