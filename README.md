@@ -1,7 +1,7 @@
 # UR5_Vision_Assemble
 Use ROS2 and Gazebo to simulate UR5e RObot with the robotiq epick gripper and realsense camera to perform a vision pick and place task.
 
-This repository is aim for sereact coding challenge. And the code base is mainly from [UR5e_Vision_Assemble](https://github.com/zitongbai/UR5e_Vision_Assemble). 
+The code base is mainly from [UR5e_Vision_Assemble](https://github.com/zitongbai/UR5e_Vision_Assemble). 
 
 The other part like vision grasp is from [ur5_ROS-Gazebo](https://github.com/lihuang3/ur5_ROS-Gazebo)
 
